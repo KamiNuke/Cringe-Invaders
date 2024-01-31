@@ -30,9 +30,15 @@ private:
 	Font* m_TimeSecond{ nullptr };
 
 	Mix_Music* m_music{ nullptr };
+	//Mix_Chunk* damageEffect{ nullptr };
 
 	Uint32 startTime;
+	Uint32 shootDelay{ 0 };
 	//Uint32 survivedSeconds{ 0 };
+
+	int chanceToSpawn{ 62 };
+
+	std::size_t MAX_ENEMIES{ 20 };
 private:
 	Ship m_ship;
 	std::vector<Bullet*> m_bullets;

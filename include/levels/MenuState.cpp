@@ -39,6 +39,16 @@ void MenuState::Enter()
 	m_MaxSurvived->CreateFont("Max seconds: " + std::to_string(saveFile.GetSurvivedSeconds()));
 	m_MaxSurvived->SetPos(10, 10);
 
+	m_controlText = new Font{};
+	m_controlText->CreateFont("Press Z to shoot");
+	m_controlText->SetPos(constants::SCREEN_WIDTH / 4, constants::SCREEN_HEIGHT - 100);
+	m_controlText->ChangeColor(SDL_Color{ 0xFF, 0xFF, 0xFF });
+
+	m_showHitboxes = new Font{};
+	m_showHitboxes->CreateFont("Press E to show hitboxes");
+	m_showHitboxes->SetPos(constants::SCREEN_WIDTH / 7, constants::SCREEN_HEIGHT - 50);
+	m_showHitboxes->ChangeColor(SDL_Color{ 0xFF, 0xFF, 0xFF });
+
 	m_buttonSound = Mix_LoadWAV("assets/sounds/blipSelect.wav");
 
 	if (m_currentState != SettingsState::Get())
@@ -69,6 +79,12 @@ void MenuState::Exit()
 
 	delete m_MaxSurvived;
 	m_MaxSurvived = nullptr;
+
+	delete m_controlText;
+	m_controlText = nullptr;
+
+	delete m_showHitboxes;
+	m_showHitboxes = nullptr;
 
 	if (nextState != SettingsState::Get())
 	{
@@ -104,15 +120,36 @@ void MenuState::HandleEvent(SDL_Event& e)
 			break;
 		}
 	}
-	if (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_UP || e.key.keysym.scancode == SDL_SCANCODE_W && e.key.repeat == 0)
+	if (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_UP && e.key.repeat == 0)
 	{
 		++m_currentButton;
 		Mix_PlayChannel(-1, m_buttonSound, 0);
 	}
-	else if(e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_DOWN || e.key.keysym.scancode == SDL_SCANCODE_S && e.key.repeat == 0)
+	else if(e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_DOWN && e.key.repeat == 0)
 	{
 		--m_currentButton;
 		Mix_PlayChannel(-1, m_buttonSound, 0);
+	}
+	else if (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_W && e.key.repeat == 0)
+	{
+		++m_currentButton;
+		Mix_PlayChannel(-1, m_buttonSound, 0);
+	}
+	else if (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_S && e.key.repeat == 0)
+	{
+		--m_currentButton;
+		Mix_PlayChannel(-1, m_buttonSound, 0);
+	}
+	else if (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_E && e.key.repeat == 0)
+	{
+		if (!isHitboxes)
+		{
+			isHitboxes = true;
+		}
+		else
+		{
+			isHitboxes = false;
+		}
 	}
 }
 
@@ -163,6 +200,8 @@ void MenuState::Render()
 	m_text4->Render();
 
 	m_MaxSurvived->Render();
+	m_controlText->Render();
+	m_showHitboxes->Render();
 }
 
 void operator++(Button& but)

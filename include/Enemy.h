@@ -20,7 +20,7 @@ public:
 	int GetPosX() const;
 	int GetPosY() const;
 
-	SDL_Rect GetRect() { return m_shipTexture->GetRect(); }
+	SDL_Rect GetRect();
 private:
 	TextureManager* m_shipTexture{ nullptr };
 

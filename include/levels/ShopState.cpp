@@ -111,7 +111,7 @@ void ShopState::HandleEvent(SDL_Event& e)
 			if (saveFile.GetCredits() >= 150)
 			{
 				saveFile.WriteToFileMaxBullets(saveFile.GetMaxBullets() + 1);
-				saveFile.WriteToFileCredits(saveFile.GetCredits() - 100);
+				saveFile.WriteToFileCredits(saveFile.GetCredits() - 150);
 			}
 			break;
 		case ShopItem::SecondItem:

@@ -43,3 +43,5 @@ IGameState* nextState{ nullptr };
 IGameState* m_currentState{ nullptr };
 
 File saveFile{ "savedata.bin" };
+
+bool isHitboxes{ false };

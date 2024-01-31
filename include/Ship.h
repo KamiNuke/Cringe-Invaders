@@ -28,12 +28,12 @@ public:
 	int GetWidth() const;
 	int GetHeight() const;
 
-	SDL_Rect GetRect() const { return m_shipTexture->GetRect(); }
+	SDL_Rect GetRect();
 private:
 	TextureManager* m_shipTexture{ nullptr };
 	Mix_Chunk* m_shootChunk{ nullptr };
 
-	int m_lives{ 1 };
+	int m_lives{ 2 };
 
 	bool m_isInvinsible{ false };
 	Uint32 m_invinsibleTime;

@@ -40,6 +40,8 @@ private:
 	Font* m_text3{ nullptr };
 	Font* m_text4{ nullptr };
 
+	Font* m_controlText{ nullptr };
+	Font* m_showHitboxes{ nullptr };
 	Font* m_MaxSurvived{ nullptr };
 
 	Mix_Music* m_music{ nullptr };

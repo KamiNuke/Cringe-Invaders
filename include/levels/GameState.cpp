@@ -4,8 +4,6 @@
 #include "Constants.h"
 #include <iostream>
 
-std::size_t MAX_ENEMIES{ 20 };
-
 GameState GameState::sGameState;
 
 GameState* GameState::Get()
@@ -23,7 +21,7 @@ void GameState::Enter()
 
 	m_livesText = new Font{};
 	m_livesText->CreateFont("Lives: " + std::to_string(m_ship.GetLives()));
-	m_livesText->SetPos(constants::SCREEN_WIDTH - m_scoreText->GetWidth() - 25, constants::SCREEN_HEIGHT - m_scoreText->GetHeight());
+	m_livesText->SetPos(constants::SCREEN_WIDTH - m_scoreText->GetWidth() - 50, constants::SCREEN_HEIGHT - m_scoreText->GetHeight());
 
 	m_TimeSecond = new Font{};
 	m_TimeSecond->CreateFont("Seconds: ");
@@ -35,9 +33,16 @@ void GameState::Enter()
 	m_music = Mix_LoadMUS("assets/sounds/song1.mp3");
 	Mix_PlayMusic(m_music, 5);
 
+	//damageEffect = Mix_LoadWAV("assets/sounds/getDamage.wav");
+
 	m_score = 0;
 
 	startTime = SDL_GetTicks();
+
+	chanceToSpawn = 62;
+	MAX_ENEMIES = 20;
+
+	shootDelay = SDL_GetTicks() + 200;
 }
 
 void GameState::Exit()
@@ -78,6 +83,9 @@ void GameState::Exit()
 
 	Mix_FreeMusic(m_music);
 	m_music = nullptr;
+
+	//Mix_FreeChunk(damageEffect);
+	//damageEffect = nullptr;
 }
 
 void GameState::HandleEvent(SDL_Event& e)
@@ -86,20 +94,42 @@ void GameState::HandleEvent(SDL_Event& e)
 	{
 		nextState = MenuState::Get();
 	}
-	else if (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_Z)
+	else if (e.type == SDL_KEYDOWN && e.key.keysym.scancode == SDL_SCANCODE_E && e.key.repeat == 0)
 	{
-		if (m_bullets.size() < saveFile.GetMaxBullets())
+		if (!isHitboxes)
 		{
-			m_bullets.emplace_back(new Bullet{});
-			m_bullets[m_bullets.size() - 1]->setPos(m_ship.GetPosX(), m_ship.GetPosY() - 10);
-			m_ship.playSound();
+			isHitboxes = true;
+		}
+		else
+		{
+			isHitboxes = false;
 		}
 	}
+
 	m_ship.handleEvent(e);
 }
 
 void GameState::Update()
 {
+	//Player shooting
+	const Uint8* keyState{ SDL_GetKeyboardState(0) };
+	if (keyState[SDL_SCANCODE_Z])
+	{
+		//check how many bullets player can shoot
+		if (m_bullets.size() < saveFile.GetMaxBullets())
+		{
+			//Delay between shooting 0.2s
+			if (SDL_GetTicks() > shootDelay + 200)
+			{
+				m_bullets.emplace_back(new Bullet{});
+				m_bullets[m_bullets.size() - 1]->setPos(m_ship.GetPosX() + 8, m_ship.GetPosY() - 14);
+				m_ship.playSound();
+
+				shootDelay = SDL_GetTicks();
+			}
+		}
+	}
+
 	srand(SDL_GetTicks());
 
 	m_ship.Update();
@@ -176,15 +206,15 @@ void GameState::Update()
 			m_enemies.erase(m_enemies.begin() + i);
 			m_ship.DistractLives();
 		}
-		else if (rand() % 128 > 125)
+		else if (rand() % 128 > 126)
 		{
 			m_enemyBullets.emplace_back(new Bullet{ true });
-			m_enemyBullets[m_enemyBullets.size() - 1]->setPos(m_enemies[i].GetPosX(), m_enemies[i].GetPosY() + 10);
+			m_enemyBullets[m_enemyBullets.size() - 1]->setPos(m_enemies[i].GetPosX() + 8, m_enemies[i].GetPosY() + 20);
 			m_enemies[i].playSound();
 		}
 	}
 
-	if (rand() % 64 >= 62)
+	if (rand() % 64 >= chanceToSpawn)
 	{
 		if (m_enemies.size() < MAX_ENEMIES)
 		{
@@ -199,12 +229,27 @@ void GameState::Update()
 		nextState = MenuState::Get();
 	}
 
-
-	if (startTime + 120000 < SDL_GetTicks())
+	if (startTime + 240000 < SDL_GetTicks())
 	{
-		MAX_ENEMIES = 100;
+		MAX_ENEMIES = 10000;
+		chanceToSpawn = 0; //always spawn
+	}
+	else if (startTime + 120000 < SDL_GetTicks())
+	{
+		MAX_ENEMIES = 1000;
+		chanceToSpawn = 20;
 	}
 	else if (startTime + 40000 < SDL_GetTicks())
+	{
+		MAX_ENEMIES = 100;
+		chanceToSpawn = 55;
+	}
+	else if (startTime + 20000 < SDL_GetTicks())
+	{
+		MAX_ENEMIES = 40;
+		chanceToSpawn = 60;
+	}
+	else if (startTime + 10000 < SDL_GetTicks())
 	{
 		MAX_ENEMIES = 40;
 	}
@@ -216,22 +261,45 @@ void GameState::Update()
 
 void GameState::Render()
 {
+	SDL_SetRenderDrawColor(renderer, 0, 0xFF, 0, 0xFF);
 	m_background->Render();
 	m_ship.Render();
+
+	if (isHitboxes)
+	{
+		SDL_Rect shipRect = m_ship.GetRect();
+		SDL_RenderDrawRect(renderer, &shipRect);
+
+	}
 
 	for (std::size_t i{ 0 }; i < m_bullets.size(); ++i)
 	{
 		m_bullets[i]->Render();
+		if (isHitboxes)
+		{
+			SDL_Rect bulletRect = m_bullets[i]->GetRect();
+			SDL_RenderDrawRect(renderer, &bulletRect);
+		}
 	}
 
 	for (std::size_t i{ 0 }; i < m_enemies.size(); ++i)
 	{
 		m_enemies[i].Render();
+		if (isHitboxes)
+		{
+			SDL_Rect enemyRect = m_enemies[i].GetRect();
+			SDL_RenderDrawRect(renderer, &enemyRect);
+		}
 	}
 
 	for (std::size_t i{ 0 }; i < m_enemyBullets.size(); ++i)
 	{
 		m_enemyBullets[i]->Render();
+		if (isHitboxes)
+		{
+			SDL_Rect bulletRect = m_enemyBullets[i]->GetRect();
+			SDL_RenderDrawRect(renderer, &bulletRect);
+		}
 	}
 
 	m_scoreText->Render();

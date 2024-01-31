@@ -16,7 +16,7 @@ void Ship::CreateShip()
 
 	m_shipTexture = new TextureManager{ "assets/ships/mainShip.png" };
 
-	m_lives = 1 + saveFile.GetAdditionalLives();
+	m_lives = 2 + saveFile.GetAdditionalLives();
 	m_isInvinsible = false;
 }
 
@@ -53,7 +53,7 @@ void Ship::Update()
 		SetPos(0, GetPosY());
 	}
 
-	if (m_invinsibleTime < SDL_GetTicks() && m_isInvinsible)
+	if (m_invinsibleTime + 2000 < SDL_GetTicks() && m_isInvinsible)
 	{
 		m_invinsibleTime = 0;
 		m_isInvinsible = false;
@@ -63,9 +63,58 @@ void Ship::Update()
 void Ship::Render()
 {
 	m_shipTexture->Render();
+	//SDL_Rect hitbox{ m_shipTexture->GetRect().x + 5, m_shipTexture->GetRect().y + 5, m_shipTexture->GetRect().w - 10, m_shipTexture->GetRect().h - 10};
+	//SDL_SetRenderDrawColor(renderer, 0, 0xFF, 0, 0xFF);
+	//SDL_RenderDrawRect(renderer, &hitbox);
 	if (m_isInvinsible)
 	{
-		m_shipTexture->setAlpha(100);
+		Uint8 alphaFirst{ 0 };
+		Uint8 alphaSecond{ 75 };
+		if (m_invinsibleTime + 2000 < SDL_GetTicks())
+		{
+			m_shipTexture->setAlpha(alphaFirst);
+		}
+		else if (m_invinsibleTime + 1800 < SDL_GetTicks())
+		{
+			m_shipTexture->setAlpha(alphaSecond);
+		}
+		else if (m_invinsibleTime + 1600 < SDL_GetTicks())
+		{
+			m_shipTexture->setAlpha(alphaFirst);
+		}
+		else if (m_invinsibleTime + 1400 < SDL_GetTicks())
+		{
+			m_shipTexture->setAlpha(alphaSecond);
+		}
+		else if (m_invinsibleTime + 1200 < SDL_GetTicks())
+		{
+			m_shipTexture->setAlpha(alphaFirst);
+		}
+		else if(m_invinsibleTime + 1000 < SDL_GetTicks())
+		{
+			m_shipTexture->setAlpha(alphaSecond);
+		}
+		else if (m_invinsibleTime + 800< SDL_GetTicks())
+		{
+			m_shipTexture->setAlpha(alphaFirst);
+		}
+		else if (m_invinsibleTime + 600 < SDL_GetTicks())
+		{
+			m_shipTexture->setAlpha(alphaSecond);
+		}
+		else if (m_invinsibleTime + 400 < SDL_GetTicks())
+		{
+			m_shipTexture->setAlpha(alphaFirst);
+		}
+		else if (m_invinsibleTime + 200 < SDL_GetTicks())
+		{
+			m_shipTexture->setAlpha(alphaSecond);
+		}
+		else if (m_invinsibleTime < SDL_GetTicks())
+		{
+			m_shipTexture->setAlpha(alphaFirst);
+		}
+		//else if(m_invinsibleTime + 500 < SDL_GetTicks())
 	}
 	else
 	{
@@ -89,7 +138,7 @@ void Ship::DistractLives()
 	{
 		m_lives -= 1;
 		m_isInvinsible = true;
-		m_invinsibleTime = SDL_GetTicks() + 1500;
+		m_invinsibleTime = SDL_GetTicks();
 	}
 }
 
@@ -116,4 +165,9 @@ int Ship::GetWidth() const
 int Ship::GetHeight() const
 {
 	return m_shipTexture->GetHeight();
+}
+
+SDL_Rect Ship::GetRect()
+{
+	return SDL_Rect{ m_shipTexture->GetRect().x + 5, m_shipTexture->GetRect().y + 5, m_shipTexture->GetRect().w - 10, m_shipTexture->GetRect().h - 10 };
 }

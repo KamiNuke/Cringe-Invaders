@@ -53,3 +53,8 @@ int Enemy::GetPosY() const
 {
 	return m_shipTexture->GetPosY();
 }
+
+SDL_Rect Enemy::GetRect()
+{
+	return SDL_Rect{ m_shipTexture->GetRect().x + 5,m_shipTexture->GetRect().y + 5, m_shipTexture->GetRect().w - 10, m_shipTexture->GetRect().h - 10 };
+}

@@ -1,0 +1,25 @@
+[Patch 2]
+* Changed shoot input. Player will now be able to shoot only 1 time per 0.2 seconds
+
+* Changed enemy ship hitbox
+
+* 
+
+[Patch 1]
+* Better hitboxes
+
+* Fixed bullet shoot location for player and enemy ships
+
+* Players now start with 2HP instead of 1HP
+
+* Added control and hitbox hint to the start menu
+
+* Players will now be able to see hitboxes by pressing E(hint is on the menu screen)
+
+* A bit changed balance
+
+* Fixed bullet cost from 100 to 150
+
+* New animation of getting damage
+
+* Invisible after getting damage now valid 5 seconds

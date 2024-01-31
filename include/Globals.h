@@ -10,4 +10,6 @@ extern IGameState* m_currentState;
 
 extern File saveFile;
 
+extern bool isHitboxes;
+
 bool CollisionCheck(const SDL_Rect a, const SDL_Rect b);
